@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--save_dir', type=str, default='save',
                     help='model directory to store checkpointed models')
-parser.add_argument('-n', type=int, default=500,
+parser.add_argument('-n', type=int, default=50,
                     help='number of characters to sample')
 parser.add_argument('--prime', type=text_type, default=u'',
                     help='prime text')
@@ -44,7 +44,10 @@ def sample(args):
             saver.restore(sess, ckpt.model_checkpoint_path)
             data = model.sample(sess, chars, vocab, args.n, args.prime,
                                args.sample).encode('utf-8')
-            print(data.decode("utf-8"))
+            with open("results/samples.txt", "w") as text_file:
+                text_file.write(data.decode("utf-8"))
+            print('sampling done.')
 
 if __name__ == '__main__':
     sample(args)
+

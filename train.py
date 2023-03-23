@@ -5,6 +5,8 @@ from __future__ import print_function
 import argparse
 import time
 import os
+import csv
+import pandas as pd
 from six.moves import cPickle
 
 
@@ -32,12 +34,12 @@ parser.add_argument('--init_from', type=str, default=None,
 # Model params
 parser.add_argument('--model', type=str, default='lstm',
                     help='lstm, rnn, gru, or nas')
-parser.add_argument('--rnn_size', type=int, default=128,
+parser.add_argument('--rnn_size', type=int, default=256,
                     help='size of RNN hidden state')
-parser.add_argument('--num_layers', type=int, default=2,
+parser.add_argument('--num_layers', type=int, default=3,
                     help='number of layers in the RNN')
 # Optimization
-parser.add_argument('--seq_length', type=int, default=50,
+parser.add_argument('--seq_length', type=int, default=12,
                     help='RNN sequence length. Number of timesteps to unroll for.')
 parser.add_argument('--batch_size', type=int, default=50,
                     help="""minibatch size. Number of sequences propagated through the network in parallel.
@@ -64,6 +66,7 @@ from model import Model
 def train(args):
     data_loader = TextLoader(args.data_dir, args.batch_size, args.seq_length)
     args.vocab_size = data_loader.vocab_size
+    loss = []
 
     # check compatibility if training is continued from previously saved model
     if args.init_from is not None:
@@ -126,6 +129,7 @@ def train(args):
                 writer.add_summary(summ, e * data_loader.num_batches + b)
 
                 end = time.time()
+                loss.append(train_loss)
                 print("{}/{} (epoch {}), train_loss = {:.3f}, time/batch = {:.3f}"
                       .format(e * data_loader.num_batches + b,
                               args.num_epochs * data_loader.num_batches,
@@ -138,7 +142,16 @@ def train(args):
                     saver.save(sess, checkpoint_path,
                                global_step=e * data_loader.num_batches + b)
                     print("model saved to {}".format(checkpoint_path))
+    df = pd.DataFrame(loss, columns = ['loss'])
+    df.to_csv('results/loss.csv', index = False)
+    #file = open('results/loss.csv','w', newline='')
+    #with file:   
+        #write = csv.writer(file, quoting = csv.QUOTE_ALL)
+        #write.writerow(loss)
+
+                    
 
 
 if __name__ == '__main__':
     train(args)
+
