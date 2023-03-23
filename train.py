@@ -45,7 +45,7 @@ parser.add_argument('--batch_size', type=int, default=50,
                     help="""minibatch size. Number of sequences propagated through the network in parallel.
                             Pick batch-sizes to fully leverage the GPU (e.g. until the memory is filled up)
                             commonly in the range 10-500.""")
-parser.add_argument('--num_epochs', type=int, default=50,
+parser.add_argument('--num_epochs', type=int, default=40,
                     help='number of epochs. Number of full passes through the training examples.')
 parser.add_argument('--grad_clip', type=float, default=5.,
                     help='clip gradients at this value')
